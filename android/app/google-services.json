@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "31864096092",
+    "project_id": "petcarev2-b791c",
+    "storage_bucket": "petcarev2-b791c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:31864096092:android:3a5c50df738bfcdc656d99",
+        "android_client_info": {
+          "package_name": "com.petcare.pet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "31864096092-b691omt5nm23aiaeun6bf3vrct33uab9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.petcare.pet",
+            "certificate_hash": "5577b0a57953ce1c3320b59d7f9c6a0698fba3ee"
+          }
+        },
+        {
+          "client_id": "31864096092-7rubihnap8ddabbgsempeaakaoejli45.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOF4Eerpc4XELCK4gMTZpllnUTqC7SidI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "31864096092-7rubihnap8ddabbgsempeaakaoejli45.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "31864096092-ulsrhbegcis64ofkg5sl4qg1mci127va.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.petcare"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
