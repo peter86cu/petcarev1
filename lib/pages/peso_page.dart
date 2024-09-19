@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:stomp_dart_client/stomp_dart_client.dart';
 import '../class/Mascota.dart';
 import '../class/PesoMascota.dart';
 import '../class/SessionProvider.dart';
@@ -11,6 +12,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:intl/intl.dart'; // Para formatear la fecha
 import 'package:http/http.dart' as http;
 
+import 'Config.dart';
 import 'Utiles.dart';
 
 
@@ -29,6 +31,7 @@ class PesoPage extends StatefulWidget {
 class _PesoPageState extends State<PesoPage> {
   final _pesoController = TextEditingController();
   String _unidadSeleccionada = 'kg'; // Unidad predeterminada
+  StompClient? stompClient;
 
   @override
   void initState() {
@@ -36,12 +39,62 @@ class _PesoPageState extends State<PesoPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final session = Provider.of<SessionProvider>(context, listen: false);
       session.checkTokenValidity(context);
+      _connectWebSocket();
     });
   }
+
+  void _connectWebSocket() {
+    final baseUrlWS = Config.get('api_ws_url');
+    stompClient = StompClient(
+      config: StompConfig(
+        url: '$baseUrlWS/ws',
+        onConnect: _onWebSocketConnected,
+        onWebSocketError: (dynamic error) => print('WebSocket error: $error'),
+        onDisconnect: (frame) => print('WebSocket disconnected'),
+      ),
+    );
+    stompClient?.activate();
+  }
+
+  void _onWebSocketConnected(StompFrame frame) {
+    stompClient?.subscribe(
+      destination: '/topic/mascota-peso',
+      callback: (StompFrame frame) {
+        setState(() {
+          if (frame.body != null) {
+            // Parse the incoming JSON data
+            final newPeso = jsonDecode(frame.body!);
+
+           // PesoMascota newPeso = newPesoData.fromJson(json);
+
+            // Update the events list of the selected mascota
+            setState(() {
+              // Iterate over the new events
+              // Iterate over the new events
+
+                // Find the index of the event if it exists
+                final existingPesoIndex = widget.mascota.peso
+                  ?.indexWhere((peso) => peso.pesoid == newPeso.peso);
+
+                if (existingPesoIndex != null && existingPesoIndex != -1) {
+                  // If the event exists, replace it
+                  widget.mascota.peso?[existingPesoIndex] = newPeso;
+                } else {
+                  // If the event does not exist, add it
+                  widget.mascota.peso?.add(newPeso);
+                }
+
+            });
+          }        });
+      },
+    );
+  }
+
 
   @override
   void dispose() {
     _pesoController.dispose();
+    stompClient?.deactivate();
     super.dispose();
   }
 
@@ -104,9 +157,13 @@ class _PesoPageState extends State<PesoPage> {
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('dd/MM/yyyy');
 
+    // Ensure the list is not null
+    final pesoList = widget.mascota.peso ?? [];
+
     // Generar puntos para la gráfica de barras
     List<BarChartGroupData>? _generarDatosGrafica() {
-      return widget.mascota.peso?.map((peso) {
+      // Use the non-null list
+      return pesoList.map((peso) {
         return BarChartGroupData(
           x: peso.fecha.day,
           barRods: [
@@ -122,9 +179,8 @@ class _PesoPageState extends State<PesoPage> {
 
     // Obtener los valores máximos y mínimos del eje Y
     double? _getMaxY() {
-      if (widget.mascota.peso!.isEmpty) return 0;
-      return widget.mascota.peso?.map((peso) => peso.peso).reduce((a, b) =>
-      a > b ? a : b);
+      if (pesoList.isEmpty) return 0;
+      return pesoList.map((peso) => peso.peso).reduce((a, b) => a > b ? a : b);
     }
 
     return Scaffold(
@@ -206,9 +262,9 @@ class _PesoPageState extends State<PesoPage> {
                               final peso = datosFiltrados[index];
                               return SideTitleWidget(
                                 axisSide: meta.axisSide,
-                                child: Text(dateFormat.format(peso.fecha),
-                                  style: TextStyle(
-                                      fontSize: 12, color: Colors.black),
+                                child: Text(
+                                  dateFormat.format(peso.fecha),
+                                  style: TextStyle(fontSize: 12, color: Colors.black),
                                 ),
                               );
                             }
@@ -228,8 +284,7 @@ class _PesoPageState extends State<PesoPage> {
                               axisSide: meta.axisSide,
                               child: Text(
                                 value.toString(),
-                                style: TextStyle(
-                                    fontSize: 12, color: Colors.black),
+                                style: TextStyle(fontSize: 12, color: Colors.black),
                               ),
                             );
                           },
@@ -250,4 +305,6 @@ class _PesoPageState extends State<PesoPage> {
       ),
     );
   }
+
+
 }

@@ -23,7 +23,7 @@ class Mascota {
   String? comportamiento;
   String fotos;
   String? fechaNacimiento;
-  User? usuario;
+  User usuario;
   List<Vacunas>? vacunas;
   List<Desparasitaciones>? desparasitaciones;
   List<PesoMascota>? peso;
@@ -51,7 +51,7 @@ class Mascota {
      this.necesidadesEspeciales,
      this.comportamiento,
     required this.fotos,
-     this.usuario,
+     required this.usuario,
      this.vacunas,
      this.desparasitaciones,
      this.peso,
@@ -127,12 +127,13 @@ class Mascota {
       'historial_medico': historialMedico,
       'necesidades_especiales': necesidadesEspeciales,
       'comportamiento': comportamiento,
+      'pesoMascota': peso?.map((p) => p.toJson()).toList(),
       'fotos': fotos,
       'fechanacimiento':fechaNacimiento,
       'usuario': usuario,
       'vacunas': vacunas?.map((v) => v.toJson()).toList(),
       'desparasitaciones': desparasitaciones?.map((d) => d.toJson()).toList(),
-      //'pesoMascota': peso?.map((p) => p.toJson()).toList(),
+
     };
   }
 }

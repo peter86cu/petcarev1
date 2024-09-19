@@ -865,7 +865,7 @@ class _MisMascotasPageState extends State<MisMascotasPage> {
   Widget build(BuildContext context) {
     final session = Provider.of<SessionProvider>(context);
     final mascotas = session.user?.mascotas ?? [];
-    final userLogin = session.user;
+    final userLogin = session.user!;
     String? token = session.token;
 
     if (mascotas.isEmpty) {

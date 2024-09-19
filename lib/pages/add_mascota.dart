@@ -16,7 +16,7 @@ import 'Config.dart';
 import 'Utiles.dart';
 
 class AddMascotaPage extends StatefulWidget {
-   final User? user;
+   final User user;
    final String? token;
   AddMascotaPage({required this.user,required this.token});
 
@@ -650,7 +650,7 @@ class _AgregarMascotaPageState extends State<AddMascotaPage> {
             height: MediaQuery
                 .of(context)
                 .size
-                .height * 0.3,
+                .height * 0.1,
             decoration: BoxDecoration(
               image: DecorationImage(
                 fit: BoxFit.cover,
@@ -765,7 +765,7 @@ class _AgregarMascotaPageState extends State<AddMascotaPage> {
           necesidadesEspeciales: '',
           comportamiento: '',
           fotos: _imagenBase64,
-          usuario: widget.user!,
+          usuario: widget.user,
           vacunas: null,
           desparasitaciones: null,
           peso: lstPeso,
