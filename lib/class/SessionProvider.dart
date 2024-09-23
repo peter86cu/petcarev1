@@ -61,12 +61,14 @@ class SessionProvider with ChangeNotifier {
 
   Future<int> addPesoMascota( PesoMascota nuevoPeso) async {
     if (_user == null) return 0;
-    //9peso.add(nuevoPeso);
+
+    final fcToken=_user!.fcToken;
     final baseUrl = Config.get('api_base_url');
     final response = await http.post(
       Uri.parse('$baseUrl/api/pet/add-peso-mascota'),
       headers: {
         'Authorization': 'Bearer $_token',
+        'fcmToken': '$fcToken',
         'Content-Type': 'application/json'
       },
       body: jsonEncode(nuevoPeso),
@@ -116,7 +118,7 @@ class SessionProvider with ChangeNotifier {
     if (_user == null) return;
     final baseUrl = Config.get('api_base_url');
     final response = await http.post(
-      Uri.parse('$baseUrl/create-user'),
+      Uri.parse('$baseUrl/api/user/create-user'),
       headers: {
         'Authorization': 'Bearer $_token',
         'Content-Type': 'application/json'
@@ -137,7 +139,7 @@ class SessionProvider with ChangeNotifier {
     if (_token == null) return;
     final baseUrl = Config.get('api_base_url');
     final response = await http.get(
-      Uri.parse('$baseUrl/check-token'),
+      Uri.parse('$baseUrl/api/autenticator/check-token'),
       headers: {
         'Authorization': 'Bearer $_token',
       },

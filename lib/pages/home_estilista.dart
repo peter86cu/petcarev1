@@ -578,7 +578,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
   Future<List<Activity>> fetchActivities(String userId, String token) async {
     final baseUrl = Config.get('api_base_url');
-    final url = Uri.parse('$baseUrl/activity-estilista?id=$userId&status=All');
+    final url = Uri.parse('$baseUrl/api/activity/activitys?id=$userId&status=All');
     final response = await http.get(url, headers: {
       'Authorization': 'Bearer '+token, // Reemplaza 'tu_token_aqui' con tu token real
       'Content-Type': 'application/json; charset=utf-8', // Ejemplo de otro encabezado opcional
@@ -721,7 +721,7 @@ class _CalendarPageState extends State<CalendarPage> {
     try {
       // Ejemplo con un API REST usando HTTP package
       final baseUrl = Config.get('api_base_url');
-      final url = Uri.parse('$baseUrl/add-evento'); // Asegúrate de que esta sea la URL correcta
+      final url = Uri.parse('$baseUrl/api/activity/add-activity'); // Asegúrate de que esta sea la URL correcta
       final session = Provider.of<SessionProvider>(context, listen: false);
       final token = session.token;
 
@@ -1154,7 +1154,8 @@ class _CalendarManagementDialogState extends State<CalendarManagementDialog> {
     final sessionProvider = Provider.of<SessionProvider>(context, listen: false);
     final Uuid uuid = Uuid();
     String? token = sessionProvider.token;
-    final url = Uri.parse('http://192.168.0.154:8080/workSchedule');
+    final baseUrlWS = Config.get('api_ws_url');
+    final url = Uri.parse('$baseUrlWS/api/parameters/workSchedule');
 
     final calendario = Calendariowork(
       id: uuid.v4(),

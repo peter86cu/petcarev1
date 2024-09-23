@@ -56,18 +56,17 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'lost_pets_page.dart';
 
-class HomePage extends StatefulWidget {
+class HomePageInicio extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePageInicio> {
   int _selectedIndex = 0;
   late FirebaseMessaging messaging;
 
   final List<Widget> _pages = [
-    PerfilActividadesScreen(),
-    MisMascotasPage(),
+    MisMascotasPageInicio(),
     //NearbyBusinessesPage(),
     PetTipsPage(),
     SharedAlbumsPage(),
@@ -126,7 +125,7 @@ class _HomePageState extends State<HomePage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => MisMascotasPage(),  // Pantalla a la que deseas navegar
+                builder: (context) => MisMascotasPageInicio(),  // Pantalla a la que deseas navegar
               ),
             );
           }
@@ -163,10 +162,7 @@ class _HomePageState extends State<HomePage> {
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+
           BottomNavigationBarItem(
             icon: Icon(Icons.pets),
             label: 'Mis Mascotas',
@@ -795,12 +791,12 @@ class _HomeContent extends State<HomeContent> {
   }
 }
 
-class MisMascotasPage extends StatefulWidget {
+class MisMascotasPageInicio extends StatefulWidget {
   @override
   _MisMascotasPageState createState() => _MisMascotasPageState();
 }
 
-class _MisMascotasPageState extends State<MisMascotasPage> {
+class _MisMascotasPageState extends State<MisMascotasPageInicio> {
   Mascota? selectedMascota;
   File? _imageFile;
   String _resultText = '';
@@ -959,10 +955,10 @@ class _MisMascotasPageState extends State<MisMascotasPage> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            if (isLoading)
+           /* if (isLoading)
               Center(
                 child: CircularProgressIndicator(),
-              ),
+              ),*/
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -2066,7 +2062,7 @@ class BusinessCalendarPage extends State<CalendarPageBusiness> {
           onConfirm: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => HomePage()),
+              MaterialPageRoute(builder: (context) => HomePageInicio()),
             );
           });
     } else if (path.contains('failure')) {
@@ -3246,332 +3242,5 @@ class _ProfileManagementPageState extends State<ProfilePage> {
         ],
       ),
     );
-  }
-}
-
-
-
-class PerfilActividadesScreen extends StatefulWidget {
-  @override
-  _PerfilActividadesScreenState createState() => _PerfilActividadesScreenState();
-}
-
-class _PerfilActividadesScreenState extends State<PerfilActividadesScreen> {
-  // Listas de perfiles y actividades
-  final List<Map<String, dynamic>> _perfiles = [
-    {'name': 'PROPIETARIO', 'image': 'lib/assets/persona.png'},
-    {'name': 'ESTILISTA', 'image': 'lib/assets/peluqueria.png'},
-    {'name': 'VETERINARIO', 'image': 'lib/assets/iconos/veterinario.png'},
-    {'name': 'TIENDA', 'image': 'lib/assets/tienda.png'},
-    {'name': 'PASEADOR', 'image': 'lib/assets/paseador.png'},
-    {'name': 'GUARDERIA', 'image': 'lib/assets/cuidador.png'},
-    {'name': 'ALBERGUES', 'image': 'lib/assets/refugio-de-animales.png'},
-    {'name': 'OTROS', 'image': 'lib/assets/otro.png'},
-  ];
-
-  final Map<String, List<Map<String, dynamic>>> _actividades = {
-    'PROPIETARIO': [
-      {'name': 'Perfil Mascota', 'image': 'lib/assets/inicio/calendario.png'},
-      {'name': 'Calendario', 'image': 'lib/assets/inicio/calendario.png'},
-      {'name': 'Pagos Online', 'image': 'lib/assets/iconos/pagos.png'},
-      // Agrega más actividades aquí
-    ],
-    'ESTILISTA': [
-      {'name': 'Calendario', 'image': 'lib/assets/inicio/calendario.png'},
-      {'name': 'Pagos Online', 'image': 'lib/assets/iconos/pagos.png'},
-      // Agrega más actividades aquí
-    ],
-    'VETERINARIO': [
-      {'name': 'Consulta', 'image': 'lib/assets/iconos/consulta.png'},
-      {'name': 'Vacunación', 'image': 'lib/assets/iconos/vacunacion.png'},
-      // Agrega más actividades aquí
-    ],
-    'TIENDA': [
-      {'name': 'Productos', 'image': 'lib/assets/iconos/productos.png'},
-      {'name': 'Ofertas', 'image': 'lib/assets/iconos/ofertas.png'},
-      // Agrega más actividades aquí
-    ],
-    'PASEADOR': [
-      {'name': 'Reservas', 'image': 'lib/assets/iconos/reservas.png'},
-      {'name': 'Rutas', 'image': 'lib/assets/iconos/rutas.png'},
-      // Agrega más actividades aquí
-    ],
-  };
-
-  // Variables de estado
-  String? _perfilSeleccionado;
-  Set<String> _actividadesSeleccionadas = {};
-  bool _isLoading = false; // Para mostrar indicador de carga
-
-  @override
-  void initState() {
-    super.initState();
-    _checkIfAlreadySelected();
-  }
-
-  Future<void> _checkIfAlreadySelected() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool? alreadySelected = prefs.getBool('alreadySelected');
-    if (alreadySelected != null && alreadySelected) {
-      // Si el usuario ya hizo una selección, no mostramos esta pantalla
-      // Puedes redirigirlo a otra pantalla o simplemente cerrar esta
-      // Por ejemplo, navegar a la pantalla principal:
-      Navigator.pushReplacementNamed(context, '/home_inicio'); // Asegúrate de tener definida esta ruta
-    }
-    // Si no ha seleccionado antes, no hacemos nada y mostramos la pantalla
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Seleccionar Perfil y Actividades'),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildPerfilesSection(),
-            Divider(color: Colors.grey),
-            _buildActividadesSection(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Construir la sección de perfiles (siempre visible)
-  Widget _buildPerfilesSection() {
-    return Container(
-      padding: EdgeInsets.all(8.0), // Ajustar el padding para compactar
-      child: Column(
-        children: [
-          Text(
-            'Perfiles',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 8),
-          GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4, // Más perfiles por fila
-              crossAxisSpacing: 5.0, // Reducir separación entre perfiles
-              mainAxisSpacing: 5.0,
-            ),
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: _perfiles.length,
-            itemBuilder: (context, index) {
-              final perfil = _perfiles[index];
-              final isSelected = _perfilSeleccionado == perfil['name'];
-
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _perfilSeleccionado = perfil['name'];
-                    _actividadesSeleccionadas.clear(); // Limpiar actividades seleccionadas
-                  });
-                },
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 60.0, // Ajustar tamaño
-                      height: 60.0,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isSelected ? Colors.blueAccent.withOpacity(0.3) : Colors.white,
-                        border: Border.all(color: Colors.orangeAccent),
-                      ),
-                      child: ClipOval(
-                        child: Image.asset(
-                          perfil['image'] as String,
-                          fit: BoxFit.cover,
-                          width: 50.0,
-                          height: 50.0,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      perfil['name'] as String,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12, // Reducir tamaño de texto
-                        color: isSelected ? Colors.blueAccent : Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Construir la sección de actividades (cambia según el perfil seleccionado)
-  Widget _buildActividadesSection() {
-    if (_perfilSeleccionado == null) {
-      return Container(
-        padding: EdgeInsets.all(16.0),
-        child: Text(
-          'Seleccione un perfil para ver las actividades relacionadas.',
-          style: TextStyle(fontSize: 16),
-        ),
-      );
-    }
-
-    final actividades = _actividades[_perfilSeleccionado] ?? [];
-
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), // Reducir padding
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Actividades para $_perfilSeleccionado',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold), // Reducir tamaño de texto
-          ),
-          SizedBox(height: 4),
-          actividades.isNotEmpty
-              ? GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // Mostrar actividades en dos columnas
-              crossAxisSpacing: 5.0,
-              mainAxisSpacing: 5.0,
-              childAspectRatio: 1.2, // Ajustar para hacer los recuadros más pequeños
-            ),
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: actividades.length,
-            itemBuilder: (context, index) {
-              final actividad = actividades[index];
-              final isSelected = _actividadesSeleccionadas.contains(actividad['name']);
-
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    if (isSelected) {
-                      _actividadesSeleccionadas.remove(actividad['name']);
-                    } else {
-                      _actividadesSeleccionadas.add(actividad['name']);
-                    }
-                  });
-                },
-                child: Container(
-                  padding: EdgeInsets.all(4.0), // Reducir padding interno
-                  decoration: BoxDecoration(
-                    color: isSelected ? Colors.blueAccent.withOpacity(0.2) : Colors.white,
-                    border: Border.all(
-                        color: isSelected ? Colors.blueAccent : Colors.orangeAccent),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ClipOval(
-                        child: Image.asset(
-                          actividad['image'] as String,
-                          fit: BoxFit.cover,
-                          width: 40.0, // Reducir tamaño de imagen
-                          height: 40.0,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        actividad['name'] as String,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 12, // Reducir tamaño de texto
-                          fontWeight: FontWeight.w500,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          )
-              : Text('No hay actividades disponibles para este perfil.'),
-          SizedBox(height: 10),
-          _isLoading
-              ? Center(child: CircularProgressIndicator())
-              : Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _perfilSeleccionado = null; // Regresar a la selección de perfil
-                    _actividadesSeleccionadas.clear();
-                  });
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
-                child: Text('Cambiar Perfil'),
-              ),
-              ElevatedButton(
-                onPressed:
-                _actividadesSeleccionadas.isNotEmpty ? _guardarActividades : null,
-                child: Text('Guardar Actividades'),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _guardarActividades() async {
-    setState(() {
-      _isLoading = true; // Mostrar indicador de carga
-    });
-
-    // Construir el cuerpo de la solicitud
-    final data = {
-      'perfil': _perfilSeleccionado,
-      'actividades': _actividadesSeleccionadas.toList(),
-    };
-
-    try {
-      // Realizar la solicitud POST a la API
-      final response = await http.post(
-        Uri.parse('https://tuapi.com/guardar_actividades'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(data),
-      );
-
-      if (response.statusCode == 200) {
-        // Éxito al guardar
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Actividades guardadas exitosamente')),
-        );
-        setState(() {
-          _actividadesSeleccionadas.clear();
-        });
-
-        // Guardar en SharedPreferences que el usuario ya hizo una selección
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setBool('alreadySelected', true);
-
-        // Navegar a otra pantalla o cerrar esta
-        Navigator.pushReplacementNamed(context, '/home_estilista'); // Asegúrate de tener definida esta ruta
-      } else {
-        // Error al guardar
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al guardar actividades')),
-        );
-      }
-    } catch (e) {
-      // Manejo de errores de conexión
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error de conexión: $e')),
-      );
-    } finally {
-      setState(() {
-        _isLoading = false; // Ocultar indicador de carga
-      });
-    }
   }
 }

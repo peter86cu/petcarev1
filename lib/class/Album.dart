@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 class Album {
   final String id;
   final String name;
-  final Mascota petId; // ID de la mascota asociada
+  final Mascota pet; // ID de la mascota asociada
   final List<Photo> photos;
   final DateTime fechaCreado;
   bool isSelected; // Nuevo campo para manejar la selección
@@ -20,7 +20,7 @@ class Album {
   Album({
     required this.id,
     required this.name,
-    required this.petId,
+    required this.pet,
     required this.photos,
     required this.fechaCreado,
     this.isSelected = false,
@@ -39,7 +39,7 @@ class Album {
     return Album(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
-      petId: Mascota.fromJson(json['mascota'] ??{}) ,
+      pet: Mascota.fromJson(json['mascota'] ??{}) ,
       photos: json['photos'] != null
           ? (json['photos'] as List).map((i) => Photo.fromJson(i)).toList()
           : [],
@@ -60,7 +60,7 @@ class Album {
     return {
       'id': id,
       'name': name,
-      'mascota': petId,
+      'mascota': pet.toJson(),
       'photos': photos.map((photo) => photo.toJson()).toList(),
       'fechaCreado': dateFormat.format(fechaCreado),
       'likeCount': likeCount,
@@ -105,7 +105,7 @@ class Photo {
 
     return {
       'photoid': photoId,
-      'album': album,
+      'album': album.toJson(),
       'photo': base64Encode(data), // Codificar la foto en Base64 para enviarla como JSON
       'fechaCreado': dateFormat.format(fechaCreado),
       'mediaType': mediaType

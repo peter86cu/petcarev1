@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -31,6 +32,56 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _telefonoController = TextEditingController();
   bool _isAccepted = false;
   late bool _isAcceptedError=true;
+  late FirebaseMessaging messaging;
+  String? fcmToken;
+
+  @override
+  void initState() {
+    super.initState();
+    initializeFirebase();
+  }
+
+  // Método para inicializar Firebase y obtener el token FCM
+  void initializeFirebase() async {
+    messaging = FirebaseMessaging.instance;
+
+    // Solicitar permisos para iOS (si es necesario)
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('User granted permission');
+
+      // Obtén el token de FCM para el dispositivo actual
+      fcmToken = await messaging.getToken();
+      print("FCM Token: $fcmToken");
+
+      // Manejar notificaciones mientras la app está en primer plano
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        print('Received a message while in foreground: ${message.notification}');
+        if (message.notification != null) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(message.notification!.title ?? "No title"),
+              content: Text(message.notification!.body ?? "No body"),
+            ),
+          );
+        }
+      });
+
+      // Manejar cuando la aplicación se abre desde una notificación (cuando está en segundo plano)
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        print('App opened from notification: ${message.notification}');
+        // Aquí puedes navegar a una pantalla específica si la app se abrió desde una notificación
+      });
+    } else {
+      print('User declined or has not accepted permission');
+    }
+  }
 
   Future<void> _registrar() async {
 
@@ -69,10 +120,10 @@ class _RegisterPageState extends State<RegisterPage> {
 
         base64Image = await Utiles.imageToBase64("imageUrl");
 
-      final persona = User(userid:userId , password: _contrasena, name: _nombre,photo: base64Image, phone: _telefono,  plataforma: "Manual", roles: lstRoles, state: 1, username: _correo, createdate: DateTime.now(), mascotas: null);
+      final persona = User(userid:userId , password: _contrasena, name: _nombre,photo: base64Image, phone: _telefono,  plataforma: "Manual", roles: lstRoles, state: 1, username: _correo, createdate: DateTime.now(), mascotas: null,fcToken: fcmToken);
       final baseUrl = Config.get('api_base_url');
       final response = await http.post(
-        Uri.parse('$baseUrl/create-user'),
+        Uri.parse('$baseUrl/api/user/create-user'),
         headers: {
           'Content-Type': 'application/json'
         },
@@ -113,7 +164,7 @@ class _RegisterPageState extends State<RegisterPage> {
       // Hacer la solicitud a la API para verificar si el correo y el teléfono están registrados
       final baseUrl = Config.get('api_base_url');
       final response = await http.get(
-        Uri.parse('$baseUrl/validar-username-phone?username=$_correo&phone=$_telefono') );
+        Uri.parse('$baseUrl/api/user/validar-username-phone?username=$_correo&phone=$_telefono') );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);

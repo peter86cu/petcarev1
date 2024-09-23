@@ -1,8 +1,10 @@
 import 'package:intl/intl.dart';
 
+import 'Mascota.dart';
+
 class PesoMascota {
-  final int pesoid;
-  final String mascotaid;
+  final String pesoid;
+  final Mascota? mascota;
   final DateTime fecha;
   final double peso;
   final String um;
@@ -11,7 +13,7 @@ class PesoMascota {
 
   PesoMascota({
     required this.pesoid,
-    required this.mascotaid,
+     this.mascota,
     required this.fecha,
     required this.peso,
     required this.um,
@@ -20,8 +22,8 @@ class PesoMascota {
 
   factory PesoMascota.fromJson(Map<String, dynamic> json) {
     return PesoMascota(
-      pesoid: json['pesoid'] ?? 0, // Proporciona un valor predeterminado si el valor es nulo
-      mascotaid: json['mascotaid'] ?? '',
+      pesoid: json['pesoid'] ?? '', // Proporciona un valor predeterminado si el valor es nulo
+      //mascota: json['mascota'] ?? '',
       fecha: json['fecha'] != null
           ? DateTime.fromMillisecondsSinceEpoch(json['fecha'])
           : DateTime.now(),
@@ -37,7 +39,7 @@ class PesoMascota {
 
     return {
       'pesoid': pesoid,
-      'mascotaid': mascotaid,
+      'mascota': mascota,
       'fecha': dateFormat.format(fecha), // Convertir DateTime a cadena
       'peso': peso,
       'um': um,

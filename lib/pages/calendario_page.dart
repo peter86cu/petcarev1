@@ -269,9 +269,9 @@ class BusinessCalendarPage extends State<CalendarPageBusinessAll> {
 
   Future<List<Activity>> fetchActivities(String userId, String token) async {
     final baseUrl = Config.get('api_base_url');
-    final url = Uri.parse('$baseUrl/activity-estilista?id=$userId&status=Aprobada');
+    final url = Uri.parse('$baseUrl/api/activity/activitys?id=$userId&status=Aprobada');
     final response = await http.get(url, headers: {
-      'Authorization': 'Bearer '+token!, // Reemplaza 'tu_token_aqui' con tu token real
+      'Authorization': 'Bearer $token', // Reemplaza 'tu_token_aqui' con tu token real
       'Content-Type': 'application/json; charset=utf-8', // Ejemplo de otro encabezado opcional
     },);
 
@@ -279,8 +279,8 @@ class BusinessCalendarPage extends State<CalendarPageBusinessAll> {
       List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
       return data.map((json) => Activity.fromJson(json)).toList();
     }else if (response.statusCode == 204) {
-      Future<List<Activity>> _activitiesFuture = Future.value([]);
-      return  _activitiesFuture;
+      Future<List<Activity>> activitiesFuture = Future.value([]);
+      return  activitiesFuture;
     } else if (response.statusCode == 401) {
      Utiles.showErrorDialogUNAUTHORIZED(context: context, title: "Sessión", content: "Debe autenticarse.");
      throw Exception('Failed to load activities');
@@ -496,7 +496,7 @@ class BusinessCalendarPage extends State<CalendarPageBusinessAll> {
   // Función para reservar el turno a través de la API
   Future<Activity> _reserveTime(DateTime selectedDay, DateTime startTime, DateTime endTime) async {
     final baseUrl = Config.get('api_base_url');
-    final url = Uri.parse('$baseUrl/add-evento'); // Asegúrate de que esta sea la URL correcta
+    final url = Uri.parse('$baseUrl/api/activity/add-activity'); // Asegúrate de que esta sea la URL correcta
     final session = Provider.of<SessionProvider>(context, listen: false);
     final token = session.token;
     final dateFormat = DateFormat('yyyy-MM-dd');

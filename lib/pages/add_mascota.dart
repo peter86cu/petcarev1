@@ -739,8 +739,8 @@ class _AgregarMascotaPageState extends State<AddMascotaPage> {
       List<PesoMascota> lstPeso = [];
       if (_peso != null) {
         final nuevoPeso = PesoMascota(
-          pesoid: 0,
-          mascotaid: mascotaTem.mascotaid,
+          pesoid: Utiles.getId(),
+          mascota: mascotaTem,
           fecha: DateTime.now(),
           peso: _peso,
           um: _unidadSeleccionada,

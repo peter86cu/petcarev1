@@ -1,6 +1,7 @@
 
 import 'package:PetCare/pages/registrar_persona.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -36,6 +37,60 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoadingGoogle = false;
   bool _isLoadingFaceID = false;
 
+  late FirebaseMessaging messaging;
+  String? fcmToken;
+
+  @override
+  void initState() {
+    super.initState();
+    initializeFirebase();
+  }
+
+
+
+  // Método para inicializar Firebase y obtener el token FCM
+  void initializeFirebase() async {
+    messaging = FirebaseMessaging.instance;
+
+    // Solicitar permisos para iOS (si es necesario)
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('User granted permission');
+
+      // Obtén el token de FCM para el dispositivo actual
+      fcmToken = await messaging.getToken();
+      print("FCM Token: $fcmToken");
+
+      // Manejar notificaciones mientras la app está en primer plano
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        print('Received a message while in foreground: ${message.notification}');
+        if (message.notification != null) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(message.notification!.title ?? "No title"),
+              content: Text(message.notification!.body ?? "No body"),
+            ),
+          );
+        }
+      });
+
+      // Manejar cuando la aplicación se abre desde una notificación (cuando está en segundo plano)
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        print('App opened from notification: ${message.notification}');
+        // Aquí puedes navegar a una pantalla específica si la app se abrió desde una notificación
+      });
+    } else {
+      print('User declined or has not accepted permission');
+    }
+  }
+
+
   Future<void> _loginWithGoogle() async {
     try {
 
@@ -62,24 +117,6 @@ class _LoginPageState extends State<LoginPage> {
 
       }
 
-      // Obtener los detalles de autenticación del request
-      /*final GoogleSignInAuthentication googleAuth =
-      await googleUser.authentication;
-
-      // Crear una credencial a partir del token
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      // Una vez que tenemos la credencial, intentamos autenticar al usuario en Firebase
-      final UserCredential userCredential =
-      await FirebaseAuth.instance.signInWithCredential(credential);
-
-      // Aquí podrías validar si el usuario existe en tu base de datos
-      // y redirigir al usuario en función de si existe o no.
-      //_showRegisterPrompt("name", "email");
-      Navigator.pushReplacementNamed(context, '/home_pr');*/
     } catch (e) {
       print("Error al iniciar sesión con Google: $e");
       // Manejo de errores, puedes mostrar un diálogo o snackbar aquí
@@ -126,7 +163,7 @@ class _LoginPageState extends State<LoginPage> {
     // Ejemplo:
     final baseUrl = Config.get('api_base_url');
     final response = await http.get(
-        Uri.parse('$baseUrl/validar-google/$email'));
+        Uri.parse('$baseUrl/api/user/validar-google/$email'));
     return response.statusCode == 200;
   }
 
@@ -241,7 +278,7 @@ class _LoginPageState extends State<LoginPage> {
       rol=3;
     else if (_selectedRole=="Tienda")
       rol=4;
-    else if (_selectedRole=="Cuidador")
+    else if (_selectedRole=="Guarderia")
       rol=5;
     else if (_selectedRole=="Paseador")
       rol=6;
@@ -261,12 +298,12 @@ class _LoginPageState extends State<LoginPage> {
     }
 
 
-    final persona =NewUser.User(userid:id , password: '', name: name, phone: '',  plataforma: _plataforma, roles: lstRoles, state: 1, username: email, createdate: DateTime.now(), mascotas: null,photo: base64Image);
+    final persona =NewUser.User(userid:id , password: '', name: name, phone: '',  plataforma: _plataforma, roles: lstRoles, state: 1, username: email, createdate: DateTime.now(), mascotas: null,photo: base64Image,fcToken: fcmToken);
     final baseUrl = Config.get('api_base_url');
 
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/create-user'),
+        Uri.parse('$baseUrl/api/user/create-user'),
         headers: {
           'Content-Type': 'application/json'
         },
@@ -306,11 +343,15 @@ class _LoginPageState extends State<LoginPage> {
       _isLoading = true;
     });
 
+    //OBTENGO EL TOKEN FCM PARA NOTIFICACIONES
+    late FirebaseMessaging messaging;
+
 
     try {
       final baseUrl = Config.get('api_base_url');
-      final url = Uri.parse('$baseUrl/login'); // URL de tu API
-      final headers = {'Content-Type': 'application/json'};
+      final url = Uri.parse('$baseUrl/api/autenticator/login'); // URL de tu API
+      final headers = {'Content-Type': 'application/json',
+        'fcmToken': fcmToken!};
       final body = json.encode({'username': _username,'password':_password,'plataforma':_plataforma});
       final response = await http.post(url, headers: headers, body: body);
 
@@ -319,7 +360,7 @@ class _LoginPageState extends State<LoginPage> {
         final userData = ResponseLogin.fromJson(responseData);
 
         //Obtener pesos de mascotas
-        if (userData.user.mascotas != null) {
+        /*if (userData.user.mascotas != null) {
           for (var mascota in userData.user.mascotas!) {
             final baseUrl = Config.get('api_base_url');
 
@@ -354,8 +395,28 @@ class _LoginPageState extends State<LoginPage> {
           }
         } else {
           print('La lista de mascotas es null');
-        }
+        }*/
 
+        if(userData.user.fcToken=="" || userData.user.fcToken != fcmToken){
+          final baseUrl = Config.get('api_base_url');
+          final url = '$baseUrl/api/user/fc/${userData.user.userid}/update/$fcmToken';
+
+          final responseFC = await http.post(
+            Uri.parse(url),
+            headers: {
+              'Authorization': 'Bearer ${userData.token}',
+              'Content-Type': 'application/json',
+            },
+          );
+            if(responseFC.statusCode==200){
+              setState(() {
+                userData.user.fcToken=fcmToken;
+              });
+            }else{
+              print('Ocurrio un error en actualizar el FC del usuario '+userData.user.username);
+            }
+
+        }
 
         final sessionProvider = Provider.of<SessionProvider>(
             context, listen: false);
@@ -370,9 +431,11 @@ class _LoginPageState extends State<LoginPage> {
         if (roles.length > 1) {
           // Mostrar modal si hay más de un rol
           _showRoleSelectionDialog(roles,sessionProvider);
-        } else {
+        } else if (roles.length == 1) {
           // Redirigir automáticamente si solo hay un rol
           _navigateToHome(roles.first.rolid,sessionProvider);
+        }else{
+          Utiles.showErrorDialog(context: context, title: 'Error', content: 'El usuario '+sessionProvider.user!.username +' no tiene asignado un perfil de acceso. Por favor contactar a un administrador.\n info@firuapp.com.uy.');
         }
       } else if (response.statusCode == 204) {
         //Obtener mensaje del response

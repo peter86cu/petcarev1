@@ -41,7 +41,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
       try{
         final baseUrl = Config.get('api_base_url');
-        final url = Uri.parse('$baseUrl/resetear-password'); // URL de tu API
+        final url = Uri.parse('$baseUrl/api/user/resetear-password'); // URL de tu API
         final headers = {'Content-Type': 'application/json'};
 
         // Agrega los parámetros a la URL

@@ -68,6 +68,7 @@ class Activity {
               roles: List.empty(),
               state: 0,
               username: '',
+              fcToken: '',
               createdate: DateTime.now(),
               mascotas: List.empty()),
           vacunas: List.empty(),
