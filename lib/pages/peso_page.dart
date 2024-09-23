@@ -106,8 +106,8 @@ class _PesoPageState extends State<PesoPage> {
     final double? peso = double.tryParse(_pesoController.text);
     if (peso != null) {
       final nuevoPeso = PesoMascota(
-        pesoid: 0,
-        mascotaid: widget.mascota.mascotaid,
+        pesoid: Utiles.getId(),
+        mascota: widget.mascota,
         fecha: DateTime.now(),
         peso: peso,
         um: _unidadSeleccionada,

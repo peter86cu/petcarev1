@@ -21,7 +21,7 @@ class _SolicitudesPageState extends State<SolicitudesPage> {
     final session = Provider.of<SessionProvider>(context, listen: false);
     final baseUrl = Config.get('api_base_url');
     String userId= session.user!.userid;
-    final url = Uri.parse('$baseUrl/activity-estilista?id=$userId&status=Pendiente');
+    final url = Uri.parse('$baseUrl/api/activity/activitys?id=$userId&status=Pendiente');
     String? token= session.token;
     final response = await http.get(url, headers: {
       'Authorization': 'Bearer '+token!, // Reemplaza 'tu_token_aqui' con tu token real
@@ -67,7 +67,7 @@ class _SolicitudesPageState extends State<SolicitudesPage> {
   Future<void> rejectActivity(String activityId, String reason) async {
     final session = Provider.of<SessionProvider>(context, listen: false);
     final baseUrl = Config.get('api_base_url');
-    final url = Uri.parse('$baseUrl/reject-activity');
+    final url = Uri.parse('$baseUrl/api/activity/reject-activity');
     String? token = session.token;
     final response = await http.post(
       url,

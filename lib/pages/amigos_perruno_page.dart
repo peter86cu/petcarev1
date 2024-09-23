@@ -194,7 +194,7 @@ class _AmigosPerrunosPageState extends State<AmigosPerrunosPage> {
       final response = await http.post(
         Uri.parse(url),
         headers: {
-          'Authorization': 'Bearer ' + session.token!,
+          'Authorization': 'Bearer ${session.token!}',
           'Content-Type': 'application/json',
         },
         body: jsonEncode(requestBody),
@@ -238,7 +238,7 @@ class _AmigosPerrunosPageState extends State<AmigosPerrunosPage> {
                 final newAlbum = Album(
                   id: Utiles.getId(),
                   name: albumNameController.text,
-                  petId: widget.mascota,
+                  pet: widget.mascota,
                   fechaCreado: DateTime.now(),
                   photos: [],
                   likeCount: 0

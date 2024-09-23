@@ -100,9 +100,9 @@ class Mascota {
           ? (json['eventos'] as List).map((i) => Event.fromJson(i)).toList()
           : [],
 
-      /*peso: json['peso'] != null
-          ? (json['peso'] as List).map((i) => PesoMascota.fromJson(i)).toList()
-          : [],*/
+      peso: json['pesoMascota'] != null
+          ? (json['pesoMascota'] as List).map((i) => PesoMascota.fromJson(i)).toList()
+          : [],
       isSelected:false,
       reservedTime: false,
       microchip: json['microchip'] ?? '',

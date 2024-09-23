@@ -38,7 +38,7 @@ class _SharedAlbumsPageState extends State<SharedAlbumsPage> {
     final session = Provider.of<SessionProvider>(context, listen: false);
     final url = '$baseUrl/api/pet/albums-shared'; // Cambia la URL según tu API
     final response = await http.get(Uri.parse(url), headers: {
-      'Authorization': 'Bearer ' + session.token!, // Reemplaza con el token correcto
+      'Authorization': 'Bearer ${session.token!}', // Reemplaza con el token correcto
       'Content-Type': 'application/json',
     });
 
@@ -137,7 +137,7 @@ class _AlbumViewerState extends State<AlbumViewer> {
     final response = await http.get(
       Uri.parse(url),
       headers: {
-        'Authorization': 'Bearer ' + session.token!,
+        'Authorization': 'Bearer ${session.token!}',
         'Content-Type': 'application/json',
         'userId': session.user!.userid,
       },
@@ -167,7 +167,7 @@ class _AlbumViewerState extends State<AlbumViewer> {
     final response = await http.post(
       Uri.parse(url),
       headers: {
-        'Authorization': 'Bearer ' + session.token!,
+        'Authorization': 'Bearer ${session.token!}',
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
@@ -252,7 +252,7 @@ class _AlbumViewerState extends State<AlbumViewer> {
               CircleAvatar(
                 radius: 30,
                 backgroundImage:
-                Utiles.buildImageBase64(album.petId.fotos, album.petId.especie),
+                Utiles.buildImageBase64(album.pet.fotos, album.pet.especie),
               ),
               SizedBox(height: 20),
               GestureDetector(

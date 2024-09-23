@@ -19,6 +19,7 @@ class User {
   final DateTime? deletedate; // Puede ser nullable si es opcional
   final List<Mascota>? mascotas;
   final String? documento;
+  late String? fcToken;
 
   User({
     required this.userid,
@@ -34,6 +35,7 @@ class User {
     required this.photo,
     required this.mascotas,
     this.documento,
+    required this.fcToken
 
   });
 
@@ -58,6 +60,7 @@ class User {
       mascotas: (json['mascotas'] as List<dynamic>? ?? [])
           .map((i) => Mascota.fromJson(i as Map<String, dynamic>))
           .toList(),
+      fcToken: json['fctoken'] ?? '',
     );
 
   }
@@ -77,6 +80,7 @@ class User {
       'createdate': dateFormat.format(createdate) ,
       //'deletedate': deletedate != null ? dateFormat.format(deletedate!) : 'Fecha no disponible',
       'mascotas': mascotas,
+      'fctoken': fcToken
     };
   }
 
